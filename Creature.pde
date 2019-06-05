@@ -15,20 +15,17 @@ public class Creature {
   void run() {
     update();
     display();
-    changeDir();
   }
-
-  void changeDir(){
-    if(position.x <= 0 || position.x >= width){
-      velocity.x = -velocity.x;
-    }
-    if(position.y <= 0 || position.y >= height){
-      velocity.y = -velocity.y;
-    }
-  }
+  
   // Method to update position
   void update() {
     velocity.add(acceleration);
+    if(position.x <= 0 || position.x >= width-9){
+      velocity.x = -velocity.x;
+    }
+    if(position.y <= 0 || position.y >= height-9){
+      velocity.y = -velocity.y;
+    }
     position.add(velocity);
     //lifespan -= 1.0;
   }
