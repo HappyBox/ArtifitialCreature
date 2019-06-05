@@ -15,6 +15,10 @@ public class Creature {
   void run() {
     update();
     display();
+    changeDir();
+  }
+
+  void changeDir(){
     if(position.x <= 0 || position.x >= width){
       velocity.x = -velocity.x;
     }
@@ -22,7 +26,6 @@ public class Creature {
       velocity.y = -velocity.y;
     }
   }
-
   // Method to update position
   void update() {
     velocity.add(acceleration);
