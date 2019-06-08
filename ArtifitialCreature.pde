@@ -1,20 +1,24 @@
+
 CreatureSystem crs;
 
 void setup() {
-  size(900, 900);
+  size(1500, 900);
   crs = new CreatureSystem();
-  for(int i = 0; i < 100; i++)
+  for(int i = 0; i < 10; i++)
   {
-    crs.addCreature(random(900), random(900));
+    crs.addCreature(random(width-100)+50, random(height-100)+50);
   }
 }
 
 void draw() {
-  background(0);
+  background(100, 150, 150);
   crs.runArray();
   
   if(mousePressed){
     crs.clean();
+  }
+  if(keyPressed == true){
+    //crs.reproduce();
   }
 }
 
@@ -23,32 +27,48 @@ void draw() {
 // An ArrayList is used to manage the list of Particles 
 
 class CreatureSystem {
-  ArrayList<Creature> particles;
+  ArrayList<Creature> eyes;
+  ArrayList<Creature> tongs;
+  ArrayList<Creature> aliens;
   PVector origin;
 
   CreatureSystem() {
     //origin = position.copy();
-    particles = new ArrayList<Creature>();
+    eyes = new ArrayList<Creature>();
+    tongs = new ArrayList<Creature>();
+    aliens = new ArrayList<Creature>();
   }
 
   void addCreature(float x, float y) {
     PVector origin = new PVector(x,y);
-    particles.add(new Creature(origin));
+    eyes.add(new Creature(origin));
   }
 
   void runArray() {
-    for (int i = particles.size()-1; i >= 0; i--) {
-      Creature c = particles.get(i);
-      c.run();
-      if (c.isDead()) {
-        particles.remove(i);
+    for (int i = eyes.size()-1; i >= 0; i--) {
+      Creature e = eyes.get(i);
+      eyes = e.reproduceIfNear(eyes, i);
+      e.run();
+      if (e.age == 10) {
+        eyes.remove(i);
       }
     }
   }
   
+  //void reproduce() {
+  //  for (int i = particles.size()-1; i >= 0; i--) {
+  //    Creature c = particles.get(i);
+  //    particles = c.reproduceIfNear(particles, i);
+  //    c.run();
+  //    if (c.isDead()) {
+  //      particles.remove(i);
+  //    }
+  //  }
+  //}
+  
   void clean() {
-    for (int i = particles.size()-1; i >= 0; i--) {
-      particles.remove(i);
+    for (int i = eyes.size()-1; i >= 0; i--) {
+      eyes.remove(i);
     }
   }
   
