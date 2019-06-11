@@ -17,9 +17,20 @@ void draw() {
   if(mousePressed){
     crs.clean();
   }
-  if(keyPressed == true){
-    //crs.reproduce();
+  if(keyPressed){
+    if(key == 'm' || key == 'M'){
+      //crs.addCreature(mouseX, mouseY);
+      crs.mMode++;
+    }
+    if(key == 'g' || key == 'G'){
+      //crs.addCreature(mouseX, mouseY);
+      crs.gMode++;
+    }
   }
+  
+  textSize(32);
+  fill(0, 102, 153);
+  text(crs.eyes.size(), 10, 40);
 }
 
 
@@ -28,15 +39,17 @@ void draw() {
 
 class CreatureSystem {
   ArrayList<Creature> eyes;
-  ArrayList<Creature> tongs;
-  ArrayList<Creature> aliens;
+  //ArrayList<Creature> tongs;
+  //ArrayList<Creature> aliens;
   PVector origin;
+  int mMode = 0;
+  int gMode = 0;
 
   CreatureSystem() {
     //origin = position.copy();
     eyes = new ArrayList<Creature>();
-    tongs = new ArrayList<Creature>();
-    aliens = new ArrayList<Creature>();
+    //tongs = new ArrayList<Creature>();
+    //aliens = new ArrayList<Creature>();
   }
 
   void addCreature(float x, float y) {
@@ -47,9 +60,12 @@ class CreatureSystem {
   void runArray() {
     for (int i = eyes.size()-1; i >= 0; i--) {
       Creature e = eyes.get(i);
-      eyes = e.reproduceIfNear(eyes, i);
+      e.mMode = mMode;
+      e.gMode = gMode;
+      eyes = e.senceEnvironment(eyes, i);
+      e.updateMatesList(eyes, i);
       e.run();
-      if (e.age == 10) {
+      if (e.age == 0) {
         eyes.remove(i);
       }
     }
