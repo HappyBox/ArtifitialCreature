@@ -1,17 +1,29 @@
-
+import processing.sound.*;
+Sound s;
+SinOsc sin;
 CreatureSystem crs;
 
 void setup() {
   size(1500, 900);
+  
+  sin = new SinOsc(this);
+  sin.play(200, 0.2);
+  sin = new SinOsc(this);
+  sin.play(205, 0.2);
+
+  // Create a Sound object for globally controlling the output volume.
+  s = new Sound(this);
+  
   crs = new CreatureSystem();
-  for(int i = 0; i < 10; i++)
+  for(int i = 0; i < 5; i++)
   {
     crs.addCreature(random(width-100)+50, random(height-100)+50);
   }
 }
 
 void draw() {
-  background(100, 150, 150);
+  s.volume(1);
+  background(255, 245, 206);
   crs.runArray();
   
   if(mousePressed){
@@ -21,6 +33,7 @@ void draw() {
     if(key == 'm' || key == 'M'){
       //crs.addCreature(mouseX, mouseY);
       crs.mMode++;
+      //sin.freq(200);
     }
     if(key == 'g' || key == 'G'){
       //crs.addCreature(mouseX, mouseY);
@@ -39,7 +52,7 @@ void draw() {
 
 class CreatureSystem {
   ArrayList<Creature> eyes;
-  //ArrayList<Creature> tongs;
+  ArrayList<Food> deadEyes;
   //ArrayList<Creature> aliens;
   PVector origin;
   int mMode = 0;
@@ -48,6 +61,7 @@ class CreatureSystem {
   CreatureSystem() {
     //origin = position.copy();
     eyes = new ArrayList<Creature>();
+    deadEyes = new ArrayList<Food>();
     //tongs = new ArrayList<Creature>();
     //aliens = new ArrayList<Creature>();
   }
@@ -58,15 +72,19 @@ class CreatureSystem {
   }
 
   void runArray() {
+    for(Food e : deadEyes) {
+      e.run();
+    }
     for (int i = eyes.size()-1; i >= 0; i--) {
       Creature e = eyes.get(i);
       e.mMode = mMode;
       e.gMode = gMode;
+      
       eyes = e.senceEnvironment(eyes, i);
-      e.updateMatesList(eyes, i);
-      e.run();
-      if (e.age == 0) {
+      e.run(eyes);
+      if (e.health <= 0 || e.countNeighbors(eyes) >= 5) {
         eyes.remove(i);
+        deadEyes.add(new Food(e.position));
       }
     }
   }
