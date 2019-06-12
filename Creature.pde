@@ -48,7 +48,7 @@ public class Creature {
       setRandomLook();
       animCount = 0;
     }
-    tint(255, health+155);
+    //tint(255, health+155);
     image(img1, position.x, position.y, imgSize, imgSize);
   }
 
@@ -185,6 +185,7 @@ public class Creature {
     if(gMode % 2 == 0){
       if(dist < 10){
         setRandomVDestination();
+        imgSize++;
       }
     }else{
       if(dist < 200){

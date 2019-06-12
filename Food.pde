@@ -15,6 +15,8 @@ public class Food {
   
   void display() {
     imageMode(CENTER);
+    tint(255, 155);
     image(img1, position.x, position.y, imgSize, imgSize);
+    tint(255, 255);  //apply tint just to this
   }
 }

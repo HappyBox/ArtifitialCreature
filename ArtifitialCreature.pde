@@ -17,7 +17,7 @@ void setup() {
   crs = new CreatureSystem();
   for(int i = 0; i < 5; i++)
   {
-    crs.addCreature(random(width-100)+50, random(height-100)+50);
+    crs.addCreature(random(50, width-50), random(50, height-50));
   }
 }
 
@@ -27,7 +27,8 @@ void draw() {
   crs.runArray();
   
   if(mousePressed){
-    crs.clean();
+   // crs.clean();
+    crs.addTongue(random(50, width-50), random(50, height-50));
   }
   if(keyPressed){
     if(key == 'm' || key == 'M'){
@@ -53,7 +54,7 @@ void draw() {
 class CreatureSystem {
   ArrayList<Creature> eyes;
   ArrayList<Food> deadEyes;
-  //ArrayList<Creature> aliens;
+  ArrayList<Tongue> tongues;
   PVector origin;
   int mMode = 0;
   int gMode = 0;
@@ -62,6 +63,7 @@ class CreatureSystem {
     //origin = position.copy();
     eyes = new ArrayList<Creature>();
     deadEyes = new ArrayList<Food>();
+    tongues = new ArrayList<Tongue>();
     //tongs = new ArrayList<Creature>();
     //aliens = new ArrayList<Creature>();
   }
@@ -69,6 +71,11 @@ class CreatureSystem {
   void addCreature(float x, float y) {
     PVector origin = new PVector(x,y);
     eyes.add(new Creature(origin));
+  }
+  
+  void addTongue(float x, float y) {
+    PVector origin = new PVector(x,y);
+    tongues.add(new Tongue(origin));
   }
 
   void runArray() {
@@ -86,6 +93,9 @@ class CreatureSystem {
         eyes.remove(i);
         deadEyes.add(new Food(e.position));
       }
+    }
+    for(Tongue e : tongues) {
+      e.run(deadEyes);
     }
   }
   
