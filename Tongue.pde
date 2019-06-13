@@ -22,10 +22,14 @@ public class Tongue {
 
   void run(ArrayList<Food> targets) {   
     
-    find(targets);
-    checkDestination();
+    if(targets.size() > 0){
+      find(targets);
+    }else{
+      setDir();
+      checkDestination();
+    }
     update();
-    borders();
+    //borders();
     display();
   }
   
@@ -46,17 +50,17 @@ public class Tongue {
       animCount = 0;
     }
     //tint(255, health+155);
-    image(img1, position.x, position.y);
+    image(img1, position.x, position.y, imgSize, imgSize);
   }
 
   //change eye movements
   void setRandomLook(){
     switch((int) random(2)) {
       case 0: 
-        img1 = loadImage("tong1.png");
+        img1 = loadImage("eye4.png");
         break;   
       default:
-        img1 = loadImage("tong2.png");
+        img1 = loadImage("eye4.png");
         break;
     }
   }
@@ -80,44 +84,25 @@ public class Tongue {
   }
 
   PVector attract(ArrayList<Food> targets){
-    PVector steer = new PVector(0, 0);
-    Food food = new Food(new PVector(0, 0));
-    float smallestDist = 99999;
-    boolean trigered = false;
-    for(Food cr : targets){
-      float dist = PVector.dist(cr.position, position);
-      if(smallestDist > dist)
-      {
-        trigered = true;
-        food = cr;
-        smallestDist = dist;
-      }
-      if(dist < 10){
-        targets.remove(cr);
-        destCount++;
-      }
-    }
-    if(trigered){
-      PVector diff = PVector.sub(food.position, position);
-      diff.normalize();
-      diff.div(smallestDist);
-      steer.add(diff);
-      if (steer.mag() > 0) {
+    Food cr = targets.get((int)random(targets.size()));
+    //float dist = PVector.dist(cr.position, position);
+    PVector diff = PVector.sub(cr.position, position); //vector poiting from position
+    diff.normalize();
+    diff.mult(3);
+    if (diff.mag() > 0) {
         // First two lines of code below could be condensed with new PVector setMag() method
         // Not using this method until Processing.js catches up
         // steer.setMag(maxspeed);
   
         // Implement Reynolds: Steering = Desired - Velocity
-        steer.normalize();
-        steer.sub(velocity);
-      }
-    }else{
-      steer = setDir();
+        //steer.normalize();
+        diff.sub(velocity);
     }
-    return steer;
+
+    return diff;
   }
 
-  PVector setDir(){
+  void setDir(){
     //get direction of destination
     PVector diff = PVector.sub(destination, position);
     //float dist = diff.mag();
@@ -126,12 +111,10 @@ public class Tongue {
     
     diff.normalize();
     diff.mult(3);
+    velocity = diff;
     
-    return diff;
-    
-    
-    //to see destination points
-    //ellipse( destination.x, destination.y, 8, 8);
+    ellipse( destination.x, destination.y, 8, 8);
+    println(destination);
   }
   
   void checkDestination(){

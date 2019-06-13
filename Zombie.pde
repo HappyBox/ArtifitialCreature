@@ -1,5 +1,5 @@
 
-public class Creature {
+public class Zombie {
   PVector position;
   PVector destination;
   PVector velocity;
@@ -13,9 +13,11 @@ public class Creature {
   int mMode = 1;
   int gMode = 0;
   int me; //my index in mates list
-  int neighbors = 0;
+  int born = 0;
+  ArrayList<Zombie> others;
+  ArrayList<Food> deadEyes;
 
-  public Creature(PVector origin) {
+  public Zombie(PVector origin) {
     acceleration = new PVector(0, 0);
     velocity = new PVector(1, 1);
     //friction = 2;
@@ -24,9 +26,11 @@ public class Creature {
     setRandomLook();
   }
 
-  void run(ArrayList<Creature> mates) {   
+  void run(ArrayList<Food> deadEyes, ArrayList<Zombie> others) {   
+    this.others = others;
+    this.deadEyes = deadEyes;
     
-    group(mates);
+    group(deadEyes);
     update();
     display();
   }
@@ -54,35 +58,55 @@ public class Creature {
 
   //change eye movements
   void setRandomLook(){
-    switch((int) random(4)) {
+    switch((int) random(5)) {
       case 0: 
-        img1 = loadImage("eyeA.png");
+        img1 = loadImage("eye1.png");
         break;
       case 1: 
-        img1 = loadImage("eyeB.png");
+        img1 = loadImage("eye2.png");
         break;
       case 2: 
-        img1 = loadImage("eyeC.png");
+        img1 = loadImage("eye3.png");
+        break;
+      case 3: 
+        img1 = loadImage("eye4.png");
         break;
       default:
-        img1 = loadImage("eyeD.png");
+        img1 = loadImage("eye5.png");
         break;
     }
   }
 
-  void group(ArrayList<Creature> others){
-    
+  void group(ArrayList<Food> deadEyes){
     
     setDir();
     checkDestination();
     
-    if(destCount % 3 == 0 && destCount != 0){
-      PVector frc = attract(others);
-      applyForce(frc);
-    }
-  
+    //if(destCount % 3 == 0 && destCount != 0){
+    PVector frc = attract(deadEyes);
+    applyForce(frc);
+    //}
+    //addTeamMates();
   }
 
+  void addTeamMates(){
+    for(int i = 0; i < born; i++){
+      others.add(new Zombie(position));
+    }
+  }
+  
+  void addTeamMate(){
+    others.add(new Zombie(position));
+  }
+  
+  ArrayList<Zombie> getZombies(){
+    return others;
+  }
+  
+  ArrayList<Food> getFoodList(){
+    return deadEyes;
+  }
+  
   //void borders() {
   //  if (position.x < -r) position.x = width+r;
   //  if (position.y < -r) position.y = height+r;
@@ -94,19 +118,30 @@ public class Creature {
     acceleration.add(force);
   }
 
-  PVector attract(ArrayList<Creature> others){
+  PVector attract(ArrayList<Food> deadEyes){
     PVector steer = new PVector(0, 0);
+    ArrayList<Food> remove = new ArrayList<Food>();
+    born = 0;
     
-    for(Creature cr : others){
+    for(Food cr : deadEyes){
       float dist = PVector.dist(cr.position, position);
-      if(dist > 0 && dist < 200){
+      if(dist > 0 && dist < 100){
         //vector to neighbor
         PVector diff = PVector.sub(cr.position, position);
         diff.normalize();
         diff.div(dist);
         steer.add(diff);
       }
+      if(dist < 10){
+        remove.add(cr);
+        //born++;
+        addTeamMate();
+        health-=5;                                                                          //Heath adjucement
+      }
     }
+    
+    deadEyes.removeAll(remove);                                                                          //Remove corpses
+    
     if (steer.mag() > 0) {
       // First two lines of code below could be condensed with new PVector setMag() method
       // Not using this method until Processing.js catches up
@@ -119,38 +154,6 @@ public class Creature {
     return steer;
   }
 
-
-
-
-  //create new creature when parent creature visit 3 destinations
-  ArrayList<Creature> senceEnvironment(ArrayList<Creature> mates, int me){
-    
-    for(int i = 0; i < mates.size()-1; i++){
-      if(i != me){
-        //get distance between eyes
-        PVector diff = PVector.sub(mates.get(i).position, position);
-        float dist = diff.mag();
-        
-        mates = reproduce(mates, dist);
-        
-        
-      }
-    }
-    return mates;
-  }
-  
-  ArrayList<Creature> reproduce(ArrayList<Creature> mates, float dist){
-    if(destCount % 3 == 0 && destCount != 0){
-      if(dist < 10){
-        //to stop reproduction 
-        destCount = 0;
-        println(me + " im near ");
-        mates.add(new Creature(position));
-        return mates;
-      }
-    }
-    return mates;
-  }
   
   //goal for a creature to move
   void setDir(){
@@ -161,7 +164,7 @@ public class Creature {
     //different movements on 
     if(mMode % 2 == 0){
       diff.normalize();
-      diff.mult(2);
+      diff.mult(3);
     }else {
       diff.div(100);
     }
@@ -179,23 +182,12 @@ public class Creature {
     float dist = diff.mag();
     if(dist < 10){
       destCount++;
-      health-=10;
+      health-=10;                                                                          //Heath adjucement
     }
-    
     if(dist < 10){
       setRandomVDestination();
       imgSize++;
     }
-  }
-  ArrayList<Zombie> eatZombies(ArrayList<Zombie> zombies){
-    for(int i = 0; i < zombies.size()-1; i++){
-      Zombie z = zombies.get(i);
-      float dist = PVector.dist(z.position, position);
-      if(dist < 10){
-        zombies.remove(i);
-      }
-    }
-    return zombies;
   }
   
   void boounceOffWalls(){

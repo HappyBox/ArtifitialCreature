@@ -6,10 +6,10 @@ CreatureSystem crs;
 void setup() {
   size(1500, 900);
   
-  sin = new SinOsc(this);
-  sin.play(200, 0.2);
-  sin = new SinOsc(this);
-  sin.play(205, 0.2);
+  //sin = new SinOsc(this);
+  //sin.play(200, 0.2);
+  //sin = new SinOsc(this);
+  //sin.play(205, 0.2);
 
   // Create a Sound object for globally controlling the output volume.
   s = new Sound(this);
@@ -27,8 +27,8 @@ void draw() {
   crs.runArray();
   
   if(mousePressed){
-   // crs.clean();
-    crs.addTongue(random(50, width-50), random(50, height-50));
+    //crs.clean();
+    crs.addZombies(random(50, width-50), random(50, height-50));
   }
   if(keyPressed){
     if(key == 'm' || key == 'M'){
@@ -45,6 +45,7 @@ void draw() {
   textSize(32);
   fill(0, 102, 153);
   text(crs.eyes.size(), 10, 40);
+  text(crs.zombies.size(), width-50, 40);
 }
 
 
@@ -54,7 +55,7 @@ void draw() {
 class CreatureSystem {
   ArrayList<Creature> eyes;
   ArrayList<Food> deadEyes;
-  ArrayList<Tongue> tongues;
+  ArrayList<Zombie> zombies;
   PVector origin;
   int mMode = 0;
   int gMode = 0;
@@ -63,7 +64,7 @@ class CreatureSystem {
     //origin = position.copy();
     eyes = new ArrayList<Creature>();
     deadEyes = new ArrayList<Food>();
-    tongues = new ArrayList<Tongue>();
+    zombies = new ArrayList<Zombie>();
     //tongs = new ArrayList<Creature>();
     //aliens = new ArrayList<Creature>();
   }
@@ -73,9 +74,9 @@ class CreatureSystem {
     eyes.add(new Creature(origin));
   }
   
-  void addTongue(float x, float y) {
+  void addZombies(float x, float y) {
     PVector origin = new PVector(x,y);
-    tongues.add(new Tongue(origin));
+    zombies.add(new Zombie(origin));
   }
 
   void runArray() {
@@ -89,13 +90,23 @@ class CreatureSystem {
       
       eyes = e.senceEnvironment(eyes, i);
       e.run(eyes);
+      e.eatZombies(zombies);
       if (e.health <= 0 || e.countNeighbors(eyes) >= 5) {
         eyes.remove(i);
         deadEyes.add(new Food(e.position));
       }
     }
-    for(Tongue e : tongues) {
-      e.run(deadEyes);
+    for(int i = 0; i < zombies.size()-1; i++) {
+      Zombie e = zombies.get(i);
+      e.run(deadEyes, zombies);
+      
+      //must be after e.run
+      deadEyes = e.getFoodList();
+      zombies = e.getZombies();
+      
+      if (e.health <= 0) {
+        zombies.remove(i);
+      }
     }
   }
   
@@ -111,8 +122,8 @@ class CreatureSystem {
   //}
   
   void clean() {
-    for (int i = eyes.size()-1; i >= 0; i--) {
-      eyes.remove(i);
+    for (int i = deadEyes.size()-1; i >= 0; i--) {
+      deadEyes.remove(i);
     }
   }
   
