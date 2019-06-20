@@ -16,6 +16,7 @@ public class Zombie {
   int born = 0;
   ArrayList<Zombie> others;
   ArrayList<Food> deadEyes;
+  int time = 0;
 
   public Zombie(PVector origin) {
     acceleration = new PVector(0, 0);
@@ -123,6 +124,8 @@ public class Zombie {
     ArrayList<Food> remove = new ArrayList<Food>();
     born = 0;
     
+    //SoundFile randomSound = sounds.get((int)random(sounds.size()));
+    
     for(Food cr : deadEyes){
       float dist = PVector.dist(cr.position, position);
       if(dist > 0 && dist < 100){
@@ -136,6 +139,8 @@ public class Zombie {
         remove.add(cr);
         //born++;
         addTeamMate();
+        //randomSound.stop();
+        //randomSound.play();
         health-=5;                                                                          //Heath adjucement
       }
     }
@@ -153,7 +158,6 @@ public class Zombie {
     }
     return steer;
   }
-
   
   //goal for a creature to move
   void setDir(){

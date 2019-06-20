@@ -14,6 +14,7 @@ public class Creature {
   int gMode = 0;
   int me; //my index in mates list
   int neighbors = 0;
+  int time = 0;
 
   public Creature(PVector origin) {
     acceleration = new PVector(0, 0);
@@ -40,7 +41,7 @@ public class Creature {
     
     acceleration.mult(0);
   }
-
+  
   void display() {
     imageMode(CENTER);
     animCount++;
@@ -140,15 +141,22 @@ public class Creature {
   }
   
   ArrayList<Creature> reproduce(ArrayList<Creature> mates, float dist){
+    
+    SoundFile randomSound = sounds.get((int)random(sounds.size()));
+    
     if(destCount % 3 == 0 && destCount != 0){
       if(dist < 10){
         //to stop reproduction 
         destCount = 0;
         println(me + " im near ");
         mates.add(new Creature(position));
+        randomSound.stop();
+        randomSound.play();
+
         return mates;
       }
     }
+    
     return mates;
   }
   
@@ -196,6 +204,14 @@ public class Creature {
       }
     }
     return zombies;
+  }
+  
+  void dieIfCorpsesNear(ArrayList<Food> corpses){
+    for(Food cr : corpses){
+      float dist = PVector.dist(position, cr.position);
+      if(dist < 10)
+        health = 0;
+    }
   }
   
   void boounceOffWalls(){

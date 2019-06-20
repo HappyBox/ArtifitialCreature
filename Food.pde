@@ -6,7 +6,7 @@ public class Food {
 
   public Food(PVector origin) {
     position = origin.copy();
-    img1 = loadImage("dead.png");
+    img1 = loadImage("eyeD.png");
   }
 
   void run() {   
